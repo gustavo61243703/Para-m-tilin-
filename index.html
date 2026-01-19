@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Para ti</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&family=Great+Vibes&display=swap');
+
+        body {
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #1e2024, #2a2d33);
+            height: 100vh;
+            overflow: hidden;
+            font-family: 'Poppins', sans-serif;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            text-align: center;
+        }
+
+        #canvas-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 0;
+            opacity: 0.2; /* Opacidad baja para que no distraiga del texto */
+        }
+
+        .container {
+            position: relative;
+            z-index: 10;
+            width: 85%;
+            max-width: 500px;
+            padding: 40px;
+            background: rgba(30, 30, 30, 0.6);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 25px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+            border: 1px solid rgba(255,255,255,0.08);
+            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        h1 {
+            font-family: 'Great Vibes', cursive;
+            font-size: 3.2em;
+            margin: 0 0 15px 0;
+            background: linear-gradient(to right, #ffafbd, #ffc3a0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            min-height: 70px;
+            filter: drop-shadow(0px 0px 5px rgba(255, 175, 189, 0.3));
+        }
+
+        p {
+            font-size: 1.15em;
+            line-height: 1.6;
+            margin-bottom: 35px;
+            min-height: 110px;
+            color: #ececec;
+            font-weight: 300;
+        }
+
+        /* --- BOTONES FLUIDOS --- */
+        .botones-container {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            position: relative; /* Necesario para el contexto */
+            min-height: 60px;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #ffafbd 0%, #ffc3a0 100%);
+            border: none;
+            color: #2a2a2a;
+            padding: 14px 40px;
+            font-size: 1.05em;
+            font-weight: 600;
+            border-radius: 50px;
+            cursor: pointer;
+            outline: none;
+            position: relative;
+            overflow: hidden;
+            
+            /* Transiciones suaves */
+            transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
+            box-shadow: 0 5px 15px rgba(255, 175, 189, 0.4);
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* Efecto Hover (pasar mouse) */
+        .btn:hover {
+            transform: scale(1.05) translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 175, 189, 0.6);
+            color: #000;
+        }
+
+        /* Efecto Active (Click presionado) */
+        .btn:active {
+            transform: scale(0.95) translateY(0);
+        }
+
+        /* Estilo específico para el botón "No" */
+        #btnNo {
+            background: linear-gradient(135deg, #6e7075, #494b50);
+            color: #ddd;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            /* Importante: transition para el movimiento de escape */
+            transition: top 0.3s ease-out, left 0.3s ease-out, transform 0.2s; 
+            z-index: 100; /* Siempre encima */
+        }
+        #btnNo:hover {
+            box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+            color: #fff;
+        }
+
+        /* Animaciones */
+        .fade-in {
+            animation: fadeIn 0.8s ease-out forwards;
+        }
+        .fade-out {
+            animation: fadeOut 0.5s ease-in forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+
+        .heart-container {
+            display: none;
+        }
+        
+        .heart-icon {
+            font-size: 70px;
+            color: #ffafbd;
+            margin-bottom: 15px;
+            animation: heartbeat 1.5s infinite ease-in-out;
+        }
+
+        @keyframes heartbeat {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.15); filter: drop-shadow(0 0 10px #ffafbd); }
+        }
+
+    </style>
+</head>
+<body>
+
+    <canvas id="canvas-bg"></canvas>
+
+    <div class="container" id="card">
+        <h1 id="titulo">Hola...</h1>
+        <p id="texto">tengo que decir algunas cosas que simplemente no me puedo guardar, y tu sabes porq... sabes como soy de sentimental...</p>
+        <button class="btn" onclick="siguienteMensaje()">Siguiente</button>
+    </div>
+
+    <div class="container heart-container" id="final">
+        <div class="heart-icon">♥</div>
+        <h1 style="font-size: 2.2em;">¿Aun me sigues queriendo?</h1>
+        <p style="font-size: 1em; margin-bottom: 25px;">Solo quiero volver a esos buenos momentos, donde me llamabas, donde nos develabamos jugando o hablando z donde podíamos ir a caminar a cualquier lado juntos.</p>
+        
+        <div class="botones-container">
+            <button class="btn" onclick="aceptar()">Si, aun lo hago</button>
+            <button class="btn" id="btnNo">No, ya no</button>
+        </div>
+    </div>
+
+    <script>
+        // --- 1. FONDO DE LLUVIA "TE AMO" ---
+        const canvas = document.getElementById('canvas-bg');
+        const ctx = canvas.getContext('2d');
+        
+        let width, height;
+        let particles = [];
+        
+        // Frases que caerán
+        const words = ["Te amo", "♥", "Te extraño", "♥", "Nosotros", "♥"];
+
+        function resize() {
+            width = window.innerWidth;
+            height = window.innerHeight;
+            canvas.width = width;
+            canvas.height = height;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        class TextParticle {
+            constructor() {
+                this.reset();
+                this.y = Math.random() * height; // Iniciar en posición aleatoria verticalmente al principio
+            }
+            
+            reset() {
+                this.x = Math.random() * width;
+                this.y = -20;
+                this.speed = Math.random() * 1.5 + 0.5; // Velocidad de caída
+                this.size = Math.random() * 14 + 10; // Tamaño de letra
+                this.text = words[Math.floor(Math.random() * words.length)];
+                this.opacity = Math.random() * 0.5 + 0.1;
+            }
+
+            update() {
+                this.y += this.speed;
+                if (this.y > height + 20) {
+                    this.reset();
+                }
+            }
+
+            draw() {
+                ctx.fillStyle = `rgba(255, 175, 189, ${this.opacity})`;
+                ctx.font = `${this.size}px 'Poppins'`;
+                ctx.fillText(this.text, this.x, this.y);
+            }
+        }
+
+        // Crear 60 partículas de texto
+        function initParticles() {
+            particles = [];
+            for(let i=0; i<60; i++) {
+                particles.push(new TextParticle());
+            }
+        }
+        initParticles();
+
+        function animateBg() {
+            ctx.clearRect(0, 0, width, height);
+            particles.forEach(p => {
+                p.update();
+                p.draw();
+            });
+            requestAnimationFrame(animateBg);
+        }
+        animateBg();
+
+
+        // --- 2. LÓGICA DE MENSAJES ---
+        const mensajes = [
+            {
+                titulo: "¿Te acuerdas?",
+                texto: "He estado pensando mucho en esos días en los que el tiempo se nos pasaba volando sin darnos cuenta, cuando pasabamos nuestras tardes simplemente en una plaza, ya sea hablando o expresandonos."
+            },
+            {
+                titulo: "Nuestras caminatas",
+                texto: "Extraño esas largas caminatas donde hablábamos de todo y de nada a la vez. Esa era mi parte favorita del día, poder simplemente pasar el rato contigo, incluso recuerdo las primeras veces que salimos."
+            },
+            {
+                titulo: "Jugar juntos",
+                texto: "También extraño divertirnos. Ya sea ganarte en un juego o simplemente reírnos de nuestras tonterías, en el roblox o wn el fri."
+            },
+            {
+                titulo: "Te extraño",
+                texto: "Me di cuenta de que las mejores salidas no dependían del lugar al que íbamos, sino de que tú estabas ahí, escucharte era lo mejor, incluso recuerdo cuando nos negabamos beso y nos enojabamos sjsjj, ahora daria todo para volver atras y no negarte ninguno."
+            }
+        ];
+
+        let paso = 0;
+        const tituloEl = document.getElementById('titulo');
+        const textoEl = document.getElementById('texto');
+        const cardEl = document.getElementById('card');
+        const finalEl = document.getElementById('final');
+
+        tituloEl.classList.add('fade-in');
+        textoEl.classList.add('fade-in');
+
+        function siguienteMensaje() {
+            tituloEl.classList.remove('fade-in');
+            textoEl.classList.remove('fade-in');
+            // Forzar reflow para reiniciar animación
+            void tituloEl.offsetWidth; 
+            
+            tituloEl.classList.add('fade-out');
+            textoEl.classList.add('fade-out');
+
+            setTimeout(() => {
+                tituloEl.classList.remove('fade-out');
+                textoEl.classList.remove('fade-out');
+
+                if (paso < mensajes.length) {
+                    tituloEl.innerText = mensajes[paso].titulo;
+                    textoEl.innerText = mensajes[paso].texto;
+                    tituloEl.classList.add('fade-in');
+                    textoEl.classList.add('fade-in');
+                    paso++;
+                } else {
+                    mostrarFinal();
+                }
+            }, 500);
+        }
+
+        function mostrarFinal() {
+            cardEl.style.transition = "opacity 0.5s ease";
+            cardEl.style.opacity = 0;
+            setTimeout(() => {
+                cardEl.style.display = 'none';
+                finalEl.style.display = 'block';
+                // Pequeño delay para que se renderice el display block antes de la animación
+                setTimeout(() => {
+                    finalEl.classList.add('fade-in');
+                }, 50);
+            }, 500);
+        }
+
+        function aceptar() {
+            alert("¡ya sabia que me ibas a elegir ush, no me dejes nunca mas porfa, ahora si puedes puedes decirme lo mucho q me extrañaste porq yo enserio textrañe demasiado, y fue una agonia no poder decírtelo:<");
+            // window.location.href = "https://wa.me/XXXXXXXXX"; 
+        }
+
+        // --- 3. BOTÓN ESCAPISTA MEJORADO ---
+        const btnNo = document.getElementById('btnNo');
+
+        // Función para mover el botón
+        const moverBoton = (e) => {
+            // Evitar comportamiento estándar si es touch
+            if(e && e.type === 'touchstart') e.preventDefault();
+
+            // Usamos position fixed para que pueda salir del contenedor
+            btnNo.style.position = 'fixed';
+            
+            // Calculamos el área segura (toda la pantalla menos el tamaño del botón)
+            // Restamos 100px extra para asegurar que no quede pegado al borde
+            const maxX = window.innerWidth - btnNo.offsetWidth - 20;
+            const maxY = window.innerHeight - btnNo.offsetHeight - 20;
+
+            const randomX = Math.random() * maxX;
+            const randomY = Math.random() * maxY;
+
+            // Asegurar que no sean coordenadas negativas
+            const safeX = Math.max(10, randomX);
+            const safeY = Math.max(10, randomY);
+
+            btnNo.style.left = safeX + 'px';
+            btnNo.style.top = safeY + 'px';
+        };
+
+        // Eventos para PC y Móvil
+        btnNo.addEventListener('mouseenter', moverBoton); // PC: Cuando el mouse entra
+        btnNo.addEventListener('touchstart', moverBoton); // Móvil: Al intentar tocar
+        btnNo.addEventListener('click', moverBoton);      // Extra seguridad
+
+    </script>
+</body>
+</html>
